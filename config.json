@@ -1,0 +1,32 @@
+{
+    "broker": {
+      "cash": 100000.0,
+      "commission": 0.00017
+    },
+    "strategy": {
+      "min_range_long": 0.022,
+      "max_range_long": 0.045,
+      "k_long": 0.045,
+      "take_k_long": 0.12,
+      "stop_k_long": 0.48,
+      "comm_long": 0.00017,
+      "min_range_short": 0.018,
+      "max_range_short": 0.05,
+      "k_short": 0.06,
+      "take_k_short": 0.17,
+      "stop_k_short": 0.5,
+      "comm_short": 0.00017,
+      "debug": false,
+      "test": true,
+      "session_end_time": "23:40:00",
+      "exit_offset": 20
+    },
+    "data": {
+      "data_source": "moex_candles",
+      "ticker": "IMOEXF",
+      "timeframe": "10",
+      "start_date": "2020-11-30",
+      "end_date": "2025-10-18"
+    }
+  }
+  
