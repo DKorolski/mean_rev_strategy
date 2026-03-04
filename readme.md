@@ -1,86 +1,56 @@
-# Mean Reversion Trading Strategy
+# mean_rev_strategy
 
-## Quick Start
+## One-liner
+Counter-trend mean-reversion strategy for `IMOEXF` on `10m` candles with rule-based entries before midday and fixed exit logic (take/stop/timeout).
 
+## Strategy rules (short)
+- Use previous-day range and close as the reference regime.
+- Enter long when price is below previous close but not in a strong breakdown.
+- Enter short when price is above previous close but not in a strong breakout.
+- Limit entries to the first half of the trading day.
+- Exit by stop-loss, take-profit, or timeout.
+
+## Data & assumptions
+- Source: MOEX candles via `aiomoex` loader (`moex_candles`).
+- Instrument: `IMOEXF`.
+- Timeframe: `10m`.
+- Run window (current showcase): `2020-11-30` to `2025-10-18`.
+- Fees: `0.00017` commission per trade side.
+- Slippage/market impact: not explicitly modeled.
+
+## Quickstart
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
+python scripts/run_backtest.py --config configs/run_c.json
 ```
 
-Run local checks:
+## Results
+![Equity curve](reports/equity_run_c.png)
 
-```bash
-pytest
-ruff check .
-black --check .
-```
+| Metric | Value |
+|---|---:|
+| Cumulative Return | 38.55% |
+| CAGR | 19.33% |
+| Sharpe | 4.44 |
+| Sortino | 9.02 |
+| Max Drawdown | -3.1% |
+| Volatility (ann.) | 5.73% |
+| Calmar | 6.23 |
 
-## Repository
+Full report: [reports/run_c/summary.md](reports/run_c/summary.md)
 
-- Remote: `https://github.com/DKorolski/mean_rev_strategy.git`
-- Branch: `main`
-- Includes both strategy scripts and research artifacts.
+## Limitations
+- This is a research repository, not a production trading system.
+- Results are sensitive to period selection and may not hold out-of-sample.
+- Execution frictions (slippage, latency, partial fills) are simplified.
+- No guarantee of future performance.
 
-## Strategy Description
-
-For each instrument, whether it is a future or a stock, there is a specific window of current dynamic parameters that indicates the instrument has entered a phase of relative non-trending behavior. Provided that this phase persists, any movement in one direction will fade and eventually reverse. This forms the basis for building a counter-trend system.
-
-### Steps:
-- Identify a relatively strong dynamic in the specific instrument.
-- Wait until the dynamics weaken.
-- Identify the movement in either direction.
-- Verify that this movement is relatively weak.
-- Open a position opposite to the movement.
-- Add a set of conditions for holding the position and exiting it.
-
-System entry is executed during the first half of the day, before 12:00, as the current conditions are compared with the dynamics from the previous day. The influence of the previous day is only relevant in the early hours of trading. The check to confirm that the market has moved upward is performed using the condition:
-
-```python
-YestDayClose = Close[1]
-Trigger2 = Close > YestDayClose
-```
-
-The third condition requires that the movement is not too strong. This means that, at the time of verification, the market should be close to yesterday’s closing level. For this, a coefficient K multiplied by the daily range DayRange is used.
-
-## Exiting the Position
-
-Exits are threefold – via take-profit, stop-loss, and timeout:
-- **Take-Profit:** If, at the close of a 15-minute bar, the price is below yesterday's closing level, the position is closed.
-- **Stop-Loss:** The position is closed when a predetermined loss level is reached.
-- **Timeout:** Exit after a fixed number of bars if the price has not reached either the take-profit or the stop-loss level.
-
-## Test Results
-
-**Testing period:** November 14, 2023 - February 21, 2025
-
-### Key Metrics:
-- **Total PnL:** Positive, with steady capital growth.
-- **Maximum Drawdown:** Within acceptable limits.
-- **Sharpe Ratio:** Moderately high, indicating a good risk-to-reward ratio.
-- **Number of Trades:** Over 100, with a high proportion of profitable trades.
-
-### Charts:
-- **Price Chart with Trade Marks (model_equity.png):** Shows entries (green triangles) and exits (red triangles) superimposed on the price series.
-- **Equity Curve Chart (Equity Curve):** Demonstrates smooth capital growth with periodic pullbacks.
-- **Extended Analysis (pre_prod_test.png):** Displays detailed trade statistics, including volumes, PnL, and return distribution.
-- **Test Report (stats_mean_rev.html):** Contains a complete analytical review of the strategy with key metrics and graphical analysis.
-
-## Conclusions and Possible Improvements
-
-- The strategy demonstrates stable profitability, although there are periods of high volatility.
-- The exit algorithm could be improved by adding dynamic stop-loss management.
-- The strategy should be tested on lower timeframes (for example, 10-minute candles) to identify potential improvements.
-- Additional analysis of factors affecting mean reversion, such as trading volumes or macroeconomic events, might be beneficial.
-
-## Files
-
-- **model_equity.png** – Price chart with trade entries and exits.
-- **pre_prod_test.png** – Detailed trade report.
-- **stats_mean_rev.html** – HTML test report.
-- **mean_rev_app.py** – Strategy code.
-- **mat_model_test.py** – Test models and calculations.
-
-## Contacts
-
-For additional information or suggestions for improving the strategy, please contact me.
+## Repo map
+- `scripts/` - backtest entrypoints
+- `configs/` - run configurations
+- `reports/` - showcase outputs (equity, HTML report, summary)
+- `data/` - local data placeholder (`.gitkeep`)
+- `mean_rev_app.py` - core strategy class
+- `moex_parser2.py` - data loader utilities

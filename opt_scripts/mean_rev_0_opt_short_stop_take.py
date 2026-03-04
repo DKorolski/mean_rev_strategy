@@ -5,7 +5,14 @@ from itertools import product
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 from functools import partial
-from moex_parser2 import *
+from pathlib import Path
+import sys
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.append(str(ROOT_DIR))
+
+from moex_parser2 import moex_candles
 from itertools import product
 from functools import partial
 from multiprocessing import Pool

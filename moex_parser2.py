@@ -1,67 +1,78 @@
 import asyncio
-import os
+from typing import Any
 
 import aiohttp
 import aiomoex
 import pandas as pd
 
-filepath = os.getcwd()
+
+def _normalize_candles_df(data: list[dict[str, Any]]) -> pd.DataFrame:
+    if not data:
+        empty = pd.DataFrame(columns=["Open", "Close", "High", "Low", "Volume", "Adj Close"])
+        empty.index = pd.DatetimeIndex([], name="Date")
+        return empty
+
+    df = pd.DataFrame(data)
+    df["begin"] = pd.to_datetime(df["begin"])
+    df = df.set_index("begin").sort_index()
+    df.index.name = "Date"
+    df = df.rename(
+        columns={
+            "open": "Open",
+            "close": "Close",
+            "high": "High",
+            "low": "Low",
+            "volume": "Volume",
+        }
+    )
+    df = df[["Open", "Close", "High", "Low", "Volume"]].copy()
+    df["Adj Close"] = df["Close"]
+    return df
+
+
+async def _fetch_board_candles(
+    security: str,
+    interval: str,
+    start: str,
+    end: str,
+    **kwargs: Any,
+) -> pd.DataFrame:
+    async with aiohttp.ClientSession() as session:
+        data = await aiomoex.get_board_candles(
+            session=session,
+            security=security,
+            interval=interval,
+            start=start,
+            end=end,
+            **kwargs,
+        )
+    return _normalize_candles_df(data)
 
 
 def moex_candles(security, interval, start, end):
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            data = await aiomoex.get_board_candles(
-                session=session,
-                engine="futures",
-                market="forts",
-                board="TQBR",
-                security=security,
-                interval=interval,
-                start=start,
-                end=end,
-            )
-            df = pd.DataFrame(data)
-            df.set_index("begin", inplace=True)
-            df.columns = ["Open", "Close", "High", "Low", "Value", "Volume", "end"]
-            df = df[["Open", "Close", "High", "Low", "Volume"]]
-            df["Adj Close"] = df["Close"]
-            df.index.names = ["Date"]
-            os.chdir(filepath)
-            df.to_csv(security + "_" + start + ".csv")
-
-    asyncio.run(main())
-    filename = security + "_" + start + ".csv"
-    df = pd.read_csv(filename, parse_dates=True, index_col=[0])
-    os.remove(filename)
-    return df
+    return asyncio.run(
+        _fetch_board_candles(
+            security=security,
+            interval=interval,
+            start=start,
+            end=end,
+            engine="futures",
+            market="forts",
+            board="TQBR",
+        )
+    )
 
 
 def moex_candles_stock(security, interval, start, end):
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            data = await aiomoex.get_board_candles(
-                session=session,
-                security=security,
-                board="TQBR",
-                interval=interval,
-                start=start,
-                end=end,
-            )
-            df = pd.DataFrame(data)
-            df.set_index("begin", inplace=True)
-            df.columns = ["Open", "Close", "High", "Low", "Value", "Volume", "end"]
-            df = df[["Open", "Close", "High", "Low", "Volume"]]
-            df["Adj Close"] = df["Close"]
-            df.index.names = ["Date"]
-            os.chdir(filepath)
-            df.to_csv(security + "_" + start + ".csv")
-
-    asyncio.run(main())
-    filename = security + "_" + start + ".csv"
-    df = pd.read_csv(filename, parse_dates=True, index_col=[0])
-    os.remove(filename)
-    return df
+    return asyncio.run(
+        _fetch_board_candles(
+            security=security,
+            interval=interval,
+            start=start,
+            end=end,
+            board="TQBR",
+        )
+    )
 
 
 def candles_resample(df, interval):
@@ -77,56 +88,26 @@ def candles_resample(df, interval):
 
 
 def moex_candles_index(security, interval, start, end):
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            data = await aiomoex.get_board_candles(
-                session=session,
-                engine="stock",
-                market="index",
-                security=security,
-                interval=interval,
-                start=start,
-                end=end,
-            )
-            df = pd.DataFrame(data)
-            df.set_index("begin", inplace=True)
-            df.columns = ["Open", "Close", "High", "Low", "Value", "Volume", "end"]
-            df = df[["Open", "Close", "High", "Low", "Volume"]]
-            df["Adj Close"] = df["Close"]
-            df.index.names = ["Date"]
-            os.chdir(filepath)
-            df.to_csv(security + "_" + start + ".csv")
-
-    asyncio.run(main())
-    filename = security + "_" + start + ".csv"
-    df = pd.read_csv(filename, parse_dates=True, index_col=[0])
-    os.remove(filename)
-    return df
+    return asyncio.run(
+        _fetch_board_candles(
+            security=security,
+            interval=interval,
+            start=start,
+            end=end,
+            engine="stock",
+            market="index",
+        )
+    )
 
 
 def moex_candles_option(security, interval, start, end):
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            data = await aiomoex.get_board_candles(
-                session=session,
-                engine="futures",
-                market="options",
-                security=security,
-                interval=interval,
-                start=start,
-                end=end,
-            )
-            df = pd.DataFrame(data)
-            df.set_index("begin", inplace=True)
-            df.columns = ["Open", "Close", "High", "Low", "Value", "Volume", "end"]
-            df = df[["Open", "Close", "High", "Low", "Volume"]]
-            df["Adj Close"] = df["Close"]
-            df.index.names = ["Date"]
-            os.chdir(filepath)
-            df.to_csv(security + "_" + start + ".csv")
-
-    asyncio.run(main())
-    filename = security + "_" + start + ".csv"
-    df = pd.read_csv(filename, parse_dates=True, index_col=[0])
-    os.remove(filename)
-    return df
+    return asyncio.run(
+        _fetch_board_candles(
+            security=security,
+            interval=interval,
+            start=start,
+            end=end,
+            engine="futures",
+            market="options",
+        )
+    )

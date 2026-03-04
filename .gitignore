@@ -8,6 +8,7 @@ venv/
 # Python cache
 __pycache__/
 */__pycache__/
+**/__pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
@@ -23,11 +24,10 @@ htmlcov/
 .vscode/
 
 # Runtime artifacts
+*.log
 /*.html
 /*.csv
 /*.pkl
-
-# Keep showcase artifacts tracked
-!/src/*.html
-!/src/*.csv
-!/src/*.png
+reports/tmp/
+data/*
+!data/.gitkeep
