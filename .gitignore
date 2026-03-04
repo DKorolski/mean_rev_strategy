@@ -1,0 +1,33 @@
+# macOS
+.DS_Store
+
+# Virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# IDE/editor
+.idea/
+.vscode/
+
+# Runtime artifacts
+/*.html
+/*.csv
+/*.pkl
+
+# Keep showcase artifacts tracked
+!/src/*.html
+!/src/*.csv
+!/src/*.png

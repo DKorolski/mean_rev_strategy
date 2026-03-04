@@ -1,5 +1,27 @@
 # Mean Reversion Trading Strategy
 
+## Quick Start
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+Run local checks:
+
+```bash
+pytest
+ruff check .
+black --check .
+```
+
+## Repository
+
+- Remote: `https://github.com/DKorolski/mean_rev_strategy.git`
+- Branch: `main`
+- Includes both strategy scripts and research artifacts.
+
 ## Strategy Description
 
 For each instrument, whether it is a future or a stock, there is a specific window of current dynamic parameters that indicates the instrument has entered a phase of relative non-trending behavior. Provided that this phase persists, any movement in one direction will fade and eventually reverse. This forms the basis for building a counter-trend system.

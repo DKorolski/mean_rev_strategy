@@ -1,0 +1,14 @@
+# Core stack
+pandas
+numpy
+scipy
+matplotlib
+
+# Backtesting and analytics
+backtrader
+quantstats
+
+# Data fetching
+aiohttp
+aiomoex
+requests

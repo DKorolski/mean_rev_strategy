@@ -1,0 +1,24 @@
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q"
+pythonpath = ["."]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+include = "(custom_data\\.py|data_prep\\.py|mean_rev_app\\.py|moex_parser2\\.py)$"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+  "src",
+  "models",
+  "opt_scripts",
+  "__pycache__",
+  ".venv",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
