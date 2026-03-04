@@ -11,16 +11,3 @@
    ```bash
    pre-commit install
    ```
-
-## Checks
-
-```bash
-pytest
-ruff check .
-black --check .
-```
-
-## Notes
-
-- Keep commits focused.
-- Avoid mixing strategy logic changes with housekeeping changes.

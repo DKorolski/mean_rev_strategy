@@ -27,6 +27,8 @@ python scripts/run_backtest.py --config configs/run_c.json
 ```
 
 ## Results
+MOEX intraday candles loaded via `aiomoex`; slippage not modeled; commission included.
+
 ![Equity curve](reports/equity_run_c.png)
 
 | Metric | Value |
